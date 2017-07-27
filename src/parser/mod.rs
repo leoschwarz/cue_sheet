@@ -17,7 +17,6 @@
 //! Parsing of cue sheets. Also contains some data types.
 
 use errors::Error;
-use regex::Regex;
 use std::str::FromStr;
 use std::fmt;
 use std::ops::Sub;
@@ -85,17 +84,19 @@ impl FromStr for Time {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // TODO consider using lazy_static
-        let re = Regex::new(r"^(\d\d):(\d\d):(\d\d)").unwrap();
-        if let Some(c) = re.captures(s) {
-            Ok(Time {
-                mins: c.get(1).unwrap().as_str().parse()?,
-                secs: c.get(2).unwrap().as_str().parse()?,
-                frames: c.get(3).unwrap().as_str().parse()?,
-            })
-        } else {
-            Err(format!("Invalid Time: {:?}", s).into())
+        if s.len() != 8 {
+            return Err("Time was not 8 chars long.".into());
         }
+
+        if s.chars().nth(2).unwrap() != ':' || s.chars().nth(5).unwrap() != ':' {
+            return Err("Time was not properly formatted.".into());
+        }
+
+        Ok(Time {
+            mins: s[0..2].parse()?,
+            secs: s[3..5].parse()?,
+            frames: s[6..8].parse()?,
+        })
     }
 }
 

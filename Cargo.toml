@@ -9,4 +9,3 @@ documentation = "https://docs.rs/cue_sheet/"
 
 [dependencies]
 error-chain = "0.10.0"
-regex = "0.2.2"

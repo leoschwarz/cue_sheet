@@ -25,7 +25,6 @@
 
 #[macro_use]
 extern crate error_chain;
-extern crate regex;
 
 pub mod errors;
 pub mod parser;
