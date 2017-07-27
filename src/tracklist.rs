@@ -101,12 +101,12 @@ impl TrackFile {
             let mut last_time: Option<Time> = None;
 
             while commands.len() > 0 {
-                if let Ok((track, indexes)) = Track::consume(commands) {
-                    if indexes.len() > 0 {
-                        let time = indexes[indexes.len() - 1].clone();
+                if let Ok(track) = Track::consume(commands) {
+                    if track.index.len() > 0 {
+                        let time = track.index[track.index.len() - 1].clone();
 
                         if let Some(start) = last_time {
-                            let stop = indexes[0].clone().1;
+                            let stop = track.index[0].clone().1;
                             let duration = stop - start;
 
                             let track_n = tracks.len();
@@ -144,6 +144,7 @@ pub struct Track {
     pub title: String,
     pub track_type: TrackType,
     pub duration: Option<Time>,
+    pub index: Vec<Index>,
     pub number: u32,
     pub performer: Option<String>,
 }
@@ -151,7 +152,7 @@ pub struct Track {
 type Index = (u32, Time);
 
 impl Track {
-    fn consume(commands: &mut Vec<Command>) -> Result<(Track, Vec<Index>), Error> {
+    fn consume(commands: &mut Vec<Command>) -> Result<Track, Error> {
         if let Command::Track(track_num, track_type) = commands.remove(0) {
             let mut title = None;
             let mut performer = None;
@@ -178,16 +179,14 @@ impl Track {
             if title.is_none() {
                 Err("Track can't have no title.".into())
             } else {
-                Ok((
-                    Track {
-                        title: title.unwrap(),
-                        track_type: track_type,
-                        duration: None,
-                        number: track_num,
-                        performer: performer,
-                    },
-                    index,
-                ))
+                Ok(Track {
+                    title: title.unwrap(),
+                    track_type: track_type,
+                    duration: None,
+                    index: index,
+                    number: track_num,
+                    performer: performer,
+                })
             }
         } else {
             Err("Track::consume called but no Track command found.".into())

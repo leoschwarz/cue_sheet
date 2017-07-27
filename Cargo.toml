@@ -1,6 +1,6 @@
 [package]
 name = "cue_sheet"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Leo Schwarz <mail@leoschwarz.com>"]
 license = "GPL-3.0"
 description = "Cue Sheet parser for Rust"
