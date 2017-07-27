@@ -21,6 +21,7 @@
 //!
 //! Additionally [GNU ccd2cue](https://www.gnu.org/software/ccd2cue/) has some more relevant docs.
 
+#![deny(missing_docs)]
 
 #[macro_use]
 extern crate error_chain;

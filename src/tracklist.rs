@@ -35,6 +35,7 @@ pub struct Tracklist {
 }
 
 impl Tracklist {
+    /// Parse a cue sheet (content provided as `source`) into a `Tracklist`.
     pub fn parse(source: &str) -> Result<Tracklist, Error> {
         let mut commands = parser::parse_cue(source)?;
 
@@ -141,11 +142,26 @@ impl TrackFile {
 /// One track described by a tracklist.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Track {
+    /// Title of the track.
     pub title: String,
+
+    /// Type of the track.
     pub track_type: TrackType,
+
+    /// Duration of the track, if it was possible to determine it.
+    ///
+    /// This is only possible if tracks have index commands attached to them.
+    /// Also note that with just a cue file it is usually not possible to determine the duration of
+    /// the last track in the list.
     pub duration: Option<Time>,
+
+    /// Index commands attached to this track (if any).
     pub index: Vec<Index>,
+
+    /// Track number as provided in the cue sheet.
     pub number: u32,
+
+    /// The performer of the track if any was stated.
     pub performer: Option<String>,
 }
 

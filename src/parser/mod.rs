@@ -35,12 +35,21 @@ const FPS: i64 = 75;
 /// Time representation of the format `mm:ss:ff`.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Time {
+    /// Number of minutes.
     pub mins: i32,
+
+    /// Number of seconds.
     pub secs: i8,
+
+    /// Number of frames.
+    ///
+    /// Cue sheets assume a fixed number of 75 frames per second, if your audio file has a
+    /// different rate, you have to do the math yourself.
     pub frames: i8,
 }
 
 impl Time {
+    /// Create a new instance with the specified field values.
     pub fn new(mins: i32, secs: i8, frames: i8) -> Time {
         Time {
             mins: mins,
@@ -114,9 +123,16 @@ pub enum FileFormat {
     /// Also includes other lossless formats.
     Wave,
 
+    /// An MP3 audio file.
     Mp3,
+
+    /// An AIFF audio file.
     Aiff,
+
+    /// Little-endian binary raw data file.
     Binary,
+
+    /// Big-endian binary raw data file.
     Motorola,
 }
 
@@ -135,6 +151,7 @@ impl FromStr for FileFormat {
     }
 }
 
+/// Additional flags a Track can have.
 #[derive(Clone, Debug)]
 pub enum TrackFlag {
     /// Digital Copy Permitted
@@ -164,6 +181,9 @@ impl FromStr for TrackFlag {
     }
 }
 
+/// Describes the type of tracks on the media.
+///
+/// Most of the times for music this will be just `Audio`.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum TrackType {
     /// Audio/Music (2352 — 588 samples)

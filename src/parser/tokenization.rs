@@ -20,8 +20,14 @@ use parser::Time;
 /// Any token as it can appear in a cue sheet.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Token {
+    /// A two digit long integer.
     Number(u32),
+
+    /// Any string, notice commands and long numbers are all treated as String for the sake of this
+    /// parser's implementation.
     String(String),
+
+    /// A time (usually relative to the start of the file).
     Time(Time),
 }
 

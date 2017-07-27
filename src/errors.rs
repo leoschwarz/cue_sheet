@@ -27,7 +27,8 @@ error_chain! {
     links { }
 
     foreign_links {
-        ParseInt(::std::num::ParseIntError);
+        ParseInt(::std::num::ParseIntError)
+            #[doc="Parsing a string into an integer failed."];
     }
 
     errors { }
