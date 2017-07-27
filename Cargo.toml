@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Leo Schwarz <mail@leoschwarz.com>"]
 license = "GPL-3.0"
 description = "Cue Sheet parser for Rust"
-repositiory = "https://github.com/leoschwarz/cue_sheet"
+repository = "https://github.com/leoschwarz/cue_sheet"
 documentation = "https://docs.rs/cue_sheet/"
 
 [dependencies]
