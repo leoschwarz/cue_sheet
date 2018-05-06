@@ -141,12 +141,12 @@ impl FromStr for FileFormat {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+        match s.to_uppercase().as_str() {
             "WAVE" => Ok(FileFormat::Wave),
             "MP3" => Ok(FileFormat::Mp3),
             "AIFF" => Ok(FileFormat::Aiff),
-            "Binary" => Ok(FileFormat::Binary),
-            "Motorola" => Ok(FileFormat::Motorola),
+            "BINARY" => Ok(FileFormat::Binary),
+            "MOTOROLA" => Ok(FileFormat::Motorola),
             _ => Err(format!("Invalid FileFormat: {:?}", s).into()),
         }
     }
@@ -172,7 +172,7 @@ impl FromStr for TrackFlag {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+        match s.to_uppercase().as_str() {
             "DCP" => Ok(TrackFlag::Dcp),
             "4CH" => Ok(TrackFlag::FourChannel),
             "PRE" => Ok(TrackFlag::Pre),
@@ -210,7 +210,7 @@ impl FromStr for TrackType {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+        match s.to_uppercase().as_str() {
             "AUDIO" => Ok(TrackType::Audio),
             "CDG" => Ok(TrackType::Cdg),
             "MODE1/2048" => Ok(TrackType::Mode(1, 2048)),
