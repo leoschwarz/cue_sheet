@@ -184,6 +184,20 @@ impl Track {
                         title = Some(t);
                         commands.remove(0);
                     }
+                    Command::Pregap(time) => {
+                        let next_command = commands.get(1).ok_or("Pregap is the last command in the track!".to_owned())?.to_owned();
+
+                        let first_index;
+                        match next_command {
+                            Command::Index(_, time) => first_index = time,
+                            _ => {
+                                return Err("Pregap is not followed by an index!".into());
+                            }
+                        }
+                        let diff = first_index.to_frames() - time.to_frames();
+                        index.push((0, Time::from_frames(diff)));
+                        commands.remove(0);
+                    }
                     Command::Index(i, time) => {
                         index.push((i, time));
                         commands.remove(0);
