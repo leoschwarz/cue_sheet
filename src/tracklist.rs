@@ -31,7 +31,7 @@ pub struct Tracklist {
     pub performer: Option<String>,
 
     /// Title of the tracklist.
-    pub title: String,
+    pub title: Option<String>,
 }
 
 impl Tracklist {
@@ -70,15 +70,11 @@ impl Tracklist {
             }
         }
 
-        if title.is_none() {
-            Err("Tracklist can't have no title.".into())
-        } else {
-            Ok(Tracklist {
-                files: files,
-                performer: performer,
-                title: title.unwrap(),
-            })
-        }
+        Ok(Tracklist {
+            files: files,
+            performer: performer,
+            title: title,
+        })
     }
 }
 
@@ -143,7 +139,7 @@ impl TrackFile {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Track {
     /// Title of the track.
-    pub title: String,
+    pub title: Option<String>,
 
     /// Type of the track.
     pub track_type: TrackType,
@@ -192,18 +188,14 @@ impl Track {
                 }
             }
 
-            if title.is_none() {
-                Err("Track can't have no title.".into())
-            } else {
-                Ok(Track {
-                    title: title.unwrap(),
-                    track_type: track_type,
-                    duration: None,
-                    index: index,
-                    number: track_num,
-                    performer: performer,
-                })
-            }
+            Ok(Track {
+                title: title,
+                track_type: track_type,
+                duration: None,
+                index: index,
+                number: track_num,
+                performer: performer,
+            })
         } else {
             Err("Track::consume called but no Track command found.".into())
         }
@@ -233,7 +225,7 @@ mod tests {
                             INDEX 01 04:17:52"#;
 
         let tracklist = Tracklist::parse(source).unwrap();
-        assert_eq!(tracklist.title, "Loveless".to_string());
+        assert_eq!(tracklist.title.unwrap(), "Loveless".to_string());
 
         let files = tracklist.files;
         assert_eq!(files.len(), 1);
@@ -245,13 +237,13 @@ mod tests {
         let ref tracks = f.tracks;
         assert_eq!(tracks.len(), 2);
 
-        assert_eq!(tracks[0].title, "Only Shallow".to_string());
+        assert_eq!(tracks[0].clone().title.unwrap(), "Only Shallow".to_string());
         assert_eq!(tracks[0].track_type, TrackType::Audio);
         assert_eq!(tracks[0].duration, Some(Time::new(4, 17, 52)));
         assert_eq!(tracks[0].number, 1);
         assert_eq!(tracks[0].performer, Some("My Bloody Valentine".to_string()));
 
-        assert_eq!(tracks[1].title, "Loomer".to_string());
+        assert_eq!(tracks[1].clone().title.unwrap(), "Loomer".to_string());
         assert_eq!(tracks[1].track_type, TrackType::Audio);
         assert_eq!(tracks[1].duration, None);
         assert_eq!(tracks[1].number, 2);
