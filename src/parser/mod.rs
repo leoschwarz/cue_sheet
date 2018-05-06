@@ -62,11 +62,13 @@ impl Time {
         format!("{:02}:{:02}", self.mins, self.secs)
     }
 
-    fn to_frames(&self) -> i64 {
+    /// Returns the number of sectors represented by this Time.
+    pub fn to_frames(&self) -> i64 {
         ((self.mins * 60) as i64 + self.secs as i64) * FPS + self.frames as i64
     }
 
-    fn from_frames(from: i64) -> Time {
+    /// Converts a sector count into a Time.
+    pub fn from_frames(from: i64) -> Time {
         let frames = from % FPS;
         let secs_all = from / FPS;
         let secs = secs_all % 60;
