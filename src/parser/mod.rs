@@ -17,6 +17,7 @@
 //! Parsing of cue sheets. Also contains some data types.
 
 use errors::Error;
+use std::cmp::Ordering;
 use std::str::FromStr;
 use std::fmt;
 use std::ops::Sub;
@@ -28,45 +29,133 @@ pub use self::tokenization::Token;
 mod command;
 pub use self::command::Command;
 
-/// Number of audio frames per second in cue sheets.
+/// Number of audio frames/sectors per second in cue sheets.
+///
+/// This value is supposed to be fixed for all cue sheets to 75 frames per second.
+/// TODO: Double-check, how does this interact with the media type?
 const FPS: i64 = 75;
 
 /// Time representation of the format `mm:ss:ff`.
-#[derive(Clone, Debug, Eq, PartialEq)]
+///
+/// Where mm = minutes, ss = seconds, ff = frames/sectors.
+/// There are 75 frames per second, 60 seconds per minute.
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Time {
-    /// Number of minutes.
-    pub mins: i32,
+    /// Minutes time component.
+    mins: i32,
 
-    /// Number of seconds.
-    pub secs: i8,
+    /// Seconds time component.
+    secs: i8,
 
-    /// Number of frames.
-    ///
-    /// Cue sheets assume a fixed number of 75 frames per second, if your audio file has a
-    /// different rate, you have to do the math yourself.
-    pub frames: i8,
+    /// Frames time component.
+    frames: i8,
 }
 
 impl Time {
-    /// Create a new instance with the specified field values.
-    pub fn new(mins: i32, secs: i8, frames: i8) -> Time {
+    /// Create a new instance with the specified components.
+    pub fn new(minutes: i32, seconds: i8, frames: i8) -> Time {
         Time {
-            mins: mins,
-            secs: secs,
+            mins: minutes,
+            secs: seconds,
             frames: frames,
         }
     }
 
-    /// Return a String consisting of only the mins and secs components.
+    /// Format as `mm:ss' dropping truncating the remainding frames.
     pub fn to_string_2(&self) -> String {
         format!("{:02}:{:02}", self.mins, self.secs)
     }
 
-    fn to_frames(&self) -> i64 {
-        ((self.mins * 60) as i64 + self.secs as i64) * FPS + self.frames as i64
+    /// Returns the "minutes" component of this instance.
+    ///
+    /// ```
+    /// use cue_sheet::parser::Time;
+    ///
+    /// let time = Time::new(1, 2, 3);
+    /// assert_eq!(time.minutes(), 1);
+    /// ```
+    pub fn minutes(&self) -> i32 {
+        self.mins
     }
 
-    fn from_frames(from: i64) -> Time {
+    /// Returns the "seconds" component of this instance.
+    ///
+    /// ```
+    /// use cue_sheet::parser::Time;
+    ///
+    /// let time = Time::new(1, 2, 3);
+    /// assert_eq!(time.seconds(), 2);
+    /// ```
+    pub fn seconds(&self) -> i8 {
+        self.secs
+    }
+
+    /// Returns the "frames/sectors" component of this instance.
+    ///
+    /// ```
+    /// use cue_sheet::parser::Time;
+    ///
+    /// let time = Time::new(1, 2, 3);
+    /// assert_eq!(time.frames(), 3);
+    /// ```
+    pub fn frames(&self) -> i8 {
+        self.frames
+    }
+
+    /// Returns the total number of minutes represented by this instance.
+    ///
+    /// ```
+    /// use cue_sheet::parser::Time;
+    ///
+    /// let time = Time::new(1, 2, 3);
+    /// assert_eq!(time.total_minutes(), 1.034);
+    ///
+    /// let time = Time::new(2, 30, 0);
+    /// assert_eq!(time.total_minutes(), 2.5);
+    /// ```
+    pub fn total_minutes(&self) -> f64 {
+        self.total_seconds() / 60.
+    }
+
+    /// Returns the total number of seconds represented by this instance.
+    ///
+    /// ```
+    /// use cue_sheet::parser::Time;
+    ///
+    /// let time = Time::new(1, 2, 3);
+    /// assert_eq!(time.total_seconds(), 62.04);
+    ///
+    /// let time = Time::new(2, 30, 0);
+    /// assert_eq!(time.total_seconds(), 150.);
+    /// ```
+    pub fn total_seconds(&self) -> f64 {
+        self.mins as f64 * 60. + self.secs as f64 + (self.frames as f64) / (FPS as f64)
+    }
+
+    /// Returns the total number of frames/sectors represented by this instance.
+    ///
+    /// ```
+    /// use cue_sheet::parser::Time;
+    ///
+    /// let time = Time::new(1, 2, 3);
+    /// assert_eq!(time.total_frames(), 4653);
+    ///
+    /// let time = Time::new(2, 30, 5);
+    /// assert_eq!(time.total_frames(), 11255);
+    /// ```
+    pub fn total_frames(&self) -> i64 {
+        (self.mins as i64 * 60 + self.secs as i64) * FPS + self.frames as i64
+    }
+
+    /// Create an instance for the specified number of frames/sectors.
+    ///
+    /// ```
+    /// use cue_sheet::parser::Time;
+    ///
+    /// let time = Time::from_frames(200);
+    /// assert_eq!(time, Time::new(0, 2, 50));
+    /// ```
+    pub fn from_frames(from: i64) -> Time {
         let frames = from % FPS;
         let secs_all = from / FPS;
         let secs = secs_all % 60;
@@ -77,6 +166,18 @@ impl Time {
             secs: secs as i8,
             frames: frames as i8,
         }
+    }
+}
+
+impl Ord for Time {
+    fn cmp(&self, other: &Time) -> Ordering {
+        self.total_frames().cmp(&other.total_frames())
+    }
+}
+
+impl PartialOrd for Time {
+    fn partial_cmp(&self, other: &Time) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -110,8 +211,8 @@ impl Sub for Time {
     type Output = Time;
 
     fn sub(self, rhs: Time) -> Self::Output {
-        let left = self.to_frames();
-        let right = rhs.to_frames();
+        let left = self.total_frames();
+        let right = rhs.total_frames();
 
         let diff = left - right;
         Time::from_frames(diff)
