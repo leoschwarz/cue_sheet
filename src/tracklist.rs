@@ -190,7 +190,7 @@ impl Track {
                                 return Err("Pregap is not followed by an index!".into());
                             }
                         }
-                        let diff = first_index.to_frames() - time.to_frames();
+                        let diff = first_index.total_frames() - time.total_frames();
                         index.push((0, Time::from_frames(diff)));
                         commands.remove(0);
                     }
@@ -262,5 +262,29 @@ mod tests {
         assert_eq!(tracks[1].duration, None);
         assert_eq!(tracks[1].number, 2);
         assert_eq!(tracks[1].performer, Some("My Bloody Valentine".to_string()));
+    }
+
+    #[test]
+    fn pregap() {
+        let src = r#"FILE "disc.img" BINARY
+                       TRACK 01 MODE1/2352
+                         INDEX 01 00:00:00
+                       TRACK 02 AUDIO
+                         PREGAP 00:02:00
+                         INDEX 01 58:41:36
+                       TRACK 03 AUDIO
+                         INDEX 00 61:06:08
+                         INDEX 01 61:08:08"#;
+
+        let tracklist = Tracklist::parse(src).unwrap();
+
+        let ref f = tracklist.files[0];
+        let ref tracks = f.tracks;
+
+        assert_eq!(tracks[0].index[0], (1, Time::new(0,0,0)));
+        assert_eq!(tracks[1].index[0], (0, Time::new(58,39,36)));
+        assert_eq!(tracks[1].index[1], (1, Time::new(58,41,36)));
+        assert_eq!(tracks[2].index[0], (0, Time::new(61,06,08)));
+        assert_eq!(tracks[2].index[1], (1, Time::new(61,08,08)));
     }
 }
