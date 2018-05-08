@@ -45,7 +45,7 @@ fn perform_conversion(source: &str) -> Result<(), Error> {
         println!(
             "{:02} {} - {} {}",
             t.number,
-            t.title,
+            t.clone().title.unwrap(),
             t.performer.clone().ok_or_else(|| {
                 Error::from("Not all tracks have a specified performer.")
             })?,
