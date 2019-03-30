@@ -128,9 +128,7 @@ impl TrackFile {
                 format: format,
             })
         } else {
-            Err(
-                "TrackFile::consume called but no Track command found.".into(),
-            )
+            Err("TrackFile::consume called but no Track command found.".into())
         }
     }
 }
@@ -181,7 +179,10 @@ impl Track {
                         commands.remove(0);
                     }
                     Command::Pregap(time) => {
-                        let next_command = commands.get(1).ok_or("Pregap is the last command in the track!".to_owned())?.to_owned();
+                        let next_command = commands
+                            .get(1)
+                            .ok_or("Pregap is the last command in the track!".to_owned())?
+                            .to_owned();
 
                         let first_index;
                         match next_command {
@@ -281,10 +282,10 @@ mod tests {
         let ref f = tracklist.files[0];
         let ref tracks = f.tracks;
 
-        assert_eq!(tracks[0].index[0], (1, Time::new(0,0,0)));
-        assert_eq!(tracks[1].index[0], (0, Time::new(58,39,36)));
-        assert_eq!(tracks[1].index[1], (1, Time::new(58,41,36)));
-        assert_eq!(tracks[2].index[0], (0, Time::new(61,06,08)));
-        assert_eq!(tracks[2].index[1], (1, Time::new(61,08,08)));
+        assert_eq!(tracks[0].index[0], (1, Time::new(0, 0, 0)));
+        assert_eq!(tracks[1].index[0], (0, Time::new(58, 39, 36)));
+        assert_eq!(tracks[1].index[1], (1, Time::new(58, 41, 36)));
+        assert_eq!(tracks[2].index[0], (0, Time::new(61, 06, 08)));
+        assert_eq!(tracks[2].index[1], (1, Time::new(61, 08, 08)));
     }
 }

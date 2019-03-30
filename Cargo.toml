@@ -1,11 +1,11 @@
 [package]
 name = "cue_sheet"
-version = "0.2.0"
-authors = ["Leo Schwarz <mail@leoschwarz.com>"]
+version = "0.3.0"
+authors = ["Leonardo Schwarz <mail@leoschwarz.com>"]
 license = "GPL-3.0"
 description = "Cue Sheet parser for Rust"
 repository = "https://github.com/leoschwarz/cue_sheet"
 documentation = "https://docs.rs/cue_sheet/"
 
 [dependencies]
-error-chain = "0.10.0"
+error-chain = "0.12.0"

@@ -24,12 +24,12 @@
 
 extern crate cue_sheet;
 
-use cue_sheet::tracklist::Tracklist;
 use cue_sheet::errors::Error;
+use cue_sheet::tracklist::Tracklist;
 
 use std::env;
-use std::io::Read;
 use std::fs::File;
+use std::io::Read;
 
 fn perform_conversion(source: &str) -> Result<(), Error> {
     let mut tracklist = Tracklist::parse(source)?;
@@ -45,10 +45,10 @@ fn perform_conversion(source: &str) -> Result<(), Error> {
         println!(
             "{:02} {} - {} {}",
             t.number,
-            t.clone().title.unwrap(),
-            t.performer.clone().ok_or_else(|| {
-                Error::from("Not all tracks have a specified performer.")
-            })?,
+            t.title.as_ref().unwrap(),
+            t.performer
+                .clone()
+                .ok_or_else(|| Error::from("Not all tracks have a specified performer."))?,
             duration
         );
     }
@@ -61,7 +61,7 @@ fn main() {
         // Try reading the file provided by the path.
         let mut file = File::open(path).expect("Failed reading file.");
         let mut content = String::new();
-        file.read_to_string(&mut content);
+        file.read_to_string(&mut content).unwrap();
 
         perform_conversion(content.as_str()).expect("Conversion failed.");
     } else {

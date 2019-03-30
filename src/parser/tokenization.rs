@@ -57,11 +57,9 @@ impl Reader {
 
     fn peek(&self, n: usize) -> Result<String, Error> {
         if self.position + n <= self.chars.len() {
-            Ok(
-                self.chars[self.position..self.position + n]
-                    .into_iter()
-                    .collect(),
-            )
+            Ok(self.chars[self.position..self.position + n]
+                .into_iter()
+                .collect())
         } else {
             Err("Tried to read out of bounds of reader.".into())
         }
@@ -89,10 +87,9 @@ impl Reader {
             Err(_) => return None,
         };
 
-        if s.chars().map(|c| DIGITS.contains(&c)).fold(
-            true,
-            |old, new| old && new,
-        )
+        if s.chars()
+            .map(|c| DIGITS.contains(&c))
+            .fold(true, |old, new| old && new)
         {
             // Return a number if the third character is either whitespace or EOF.
             if let Ok(s3) = self.peek(3) {

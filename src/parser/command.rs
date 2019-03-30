@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use super::{FileFormat, TrackFlag, Time, Token, TrackType};
-use std::str::FromStr;
+use super::{FileFormat, Time, Token, TrackFlag, TrackType};
 use errors::Error;
+use std::str::FromStr;
 
 /// The main grammar element of CUE sheets.
 #[derive(Clone, Debug)]
@@ -73,9 +73,7 @@ fn consume_token(tokens: &mut Vec<Token>) -> Result<Token, Error> {
 fn consume_time(tokens: &mut Vec<Token>) -> Result<Time, Error> {
     match consume_token(tokens)? {
         Token::Time(duration) => Ok(duration),
-        t => Err(
-            format!("Expected duration but found {:?} instead", t).into(),
-        ),
+        t => Err(format!("Expected duration but found {:?} instead", t).into()),
     }
 }
 
@@ -109,15 +107,13 @@ impl Command {
                 while tokens.len() > 0 {
                     let token = tokens.remove(0);
                     let ok = match token {
-                        Token::String(ref s) => {
-                            match TrackFlag::from_str(s.as_str()) {
-                                Ok(flag) => {
-                                    flags.push(flag);
-                                    true
-                                }
-                                Err(_) => false,
+                        Token::String(ref s) => match TrackFlag::from_str(s.as_str()) {
+                            Ok(flag) => {
+                                flags.push(flag);
+                                true
                             }
-                        }
+                            Err(_) => false,
+                        },
                         _ => false,
                     };
 
@@ -128,9 +124,7 @@ impl Command {
                 }
 
                 if flags.len() == 0 {
-                    Err(
-                        "Encountered FLAGS command without succeeding TrackFlag".into(),
-                    )
+                    Err("Encountered FLAGS command without succeeding TrackFlag".into())
                 } else {
                     Ok(Command::Flags(flags))
                 }

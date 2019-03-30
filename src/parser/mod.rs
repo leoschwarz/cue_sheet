@@ -18,9 +18,9 @@
 
 use errors::Error;
 use std::cmp::Ordering;
-use std::str::FromStr;
 use std::fmt;
 use std::ops::Sub;
+use std::str::FromStr;
 
 mod tokenization;
 use self::tokenization::tokenize;
