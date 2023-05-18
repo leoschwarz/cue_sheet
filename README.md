@@ -1,4 +1,8 @@
-# cue_sheet
+# cue_sheet: Discontinued
+Thank you for your interest in this project.  
+This project is no longer updated or maintained and this repository will be archived.
+
+## Old readme:
 [![current version](https://meritbadge.herokuapp.com/cue_sheet)](https://crates.io/crates/cue_sheet)
 [![docs link](https://docs.rs/cue_sheet/badge.svg)](https://docs.rs/cue_sheet/)
 [![build status](https://travis-ci.org/leoschwarz/cue_sheet.svg?branch=master)](https://travis-ci.org/leoschwarz/cue_sheet)
